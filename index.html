@@ -1,14 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Toyrock">
+    <title>Iron Space</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/general.css">  
-    <title>Iron-Space</title>
+    <script src="js/index.js" defer></script> 
+    
+    <canvas class="canvas" width="600" height="600"></canvas>
+
 </head>
 <body>
-    
+    <div id="area">
+        <div class="group">				
+            <h5 class="score" id="score">score: 0</h5>
+        </div>
+        <img class="player" src="/img/craft.gif" alt="hero">
+			<h5 class="instructions" id="game-over">
+				Defend Your Unuiverse!
+			</h5>
+			<h1 class="start-button" id="restart-button">START</h1>
+		</div>
+        <audio src="sound/fire.wav" preload="auto" id="sfxShoot"></audio>
+		<audio src="sound/exp.wav" preload="auto" id="sfxExplosion"></audio>
 </body>
 </html>
