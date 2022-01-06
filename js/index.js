@@ -9,7 +9,7 @@ let score = 0;
 let canvas = document.querySelector('canvas');
 let ctx = canvas.getContext('2d');
 let gameBcK = new Image();
-gameBcK.src = 'img/bground.jpg';
+gameBcK.src = '.img/bground.jpg';
 
 let sfxShoot=document.getElementById("sfxShoot");
 let sfxExplosion=document.getElementById("sfxExplosion");
@@ -87,7 +87,7 @@ function playerMovement(event) {
           sfxExplosion.play();
           score++;
           scoreboardRefresh();
-          enemy.src = '/img/explosion.gif';
+          enemy.src = './img/explosion.gif';
           enemy.classList.remove('enemy');
           enemy.classList.add('dead-enemy');
       }
