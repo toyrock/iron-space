@@ -6,10 +6,8 @@ const startButton = document.querySelector('.start-button');
 let enemyInterval;
 let score = 0;
 
-let canvas = document.querySelector('canvas');
-let ctx = canvas.getContext('2d');
 let gameBcK = new Image();
-gameBcK.src = '.img/bground.jpg';
+gameBcK.src = 'img/bground.jpg';
 
 let sfxShoot=document.getElementById("sfxShoot");
 let sfxExplosion=document.getElementById("sfxExplosion");
@@ -19,6 +17,15 @@ let Key = {
   SpaceBar: 32,
   W: 87,
   S: 83,
+}
+let GameDimensions = {
+  width: 600,
+  height: 600,
+  playerMove: 30,
+  playerHeight: 60,
+  enemyHeight: 40,
+  missleHeight: 20,
+  missleWidth: 30
 }
 
 function playerMovement(event) {
@@ -36,27 +43,28 @@ function playerMovement(event) {
 
 
   function moveUp() {
-    let topPosition = getComputedStyle(playerCraft).getPropertyValue('top');
-    if(topPosition === "0px") {
-      return
+    let topPosition = parseInt(getComputedStyle(playerCraft).getPropertyValue('top'));
+    if(topPosition < (GameDimensions.playerHeight/2)) {
+      return false;
     } else {
         let position = parseInt(topPosition);
-        position -= 50;
+        position -= GameDimensions.playerMove;
         playerCraft.style.top = `${position}px`;
     }
   }
   
   function moveDown() {
-    let topPosition = getComputedStyle(playerCraft).getPropertyValue('top');
-    if(topPosition === "500px") {
+    let topPosition = parseInt(getComputedStyle(playerCraft).getPropertyValue('top'));
+    if(topPosition >= (GameDimensions.height-GameDimensions.playerHeight-(GameDimensions.playerHeight/2))) {
       return
     } else {
-        let position = parseInt(topPosition);
-        position += 50;
+        let position = topPosition;
+        position += GameDimensions.playerMove;
         playerCraft.style.top = `${position}px`;
     }
   }
 
+  //Fire Missile
   function fireMissle() {
     sfxShoot.play();
     let missle = createMissleElement();
@@ -68,54 +76,55 @@ function playerMovement(event) {
     let xPosition = parseInt(window.getComputedStyle(playerCraft).getPropertyValue('left'));
     let yPosition = parseInt(window.getComputedStyle(playerCraft).getPropertyValue('top'));
     let newMissle = document.createElement('img');
-    newMissle.src = './img/missle.gif';
+    newMissle.src = './img/missile.gif';
     newMissle.classList.add('missle');
     newMissle.style.left = `${xPosition}px`;
-    newMissle.style.top = `${yPosition - 10}px`;
+    newMissle.style.top = `${yPosition - 18}px`;
     return newMissle;
-
   }
 
   function moveMissle(missle) {
-      let missleInterval = setInterval(() => {
-        let xPosition = parseInt(missle.style.left);
-        let enemies = document.querySelectorAll('.enemy');
-    
-        enemies.forEach((enemy) => {
-          if(checkMissleCollision(missle, enemy)) {
+    let missleInterval = setInterval(() => {
+      let xPosition = parseInt(missle.style.left);
+      let enemies = document.querySelectorAll('.enemy');
 
+      enemies.forEach((enemy) => {
+        if(checkMissleCollision(missle, enemy)) {
           sfxExplosion.play();
           score++;
           scoreboardRefresh();
           enemy.src = './img/explosion.gif';
           enemy.classList.remove('enemy');
           enemy.classList.add('dead-enemy');
+          missle.remove();
       }
- 
-    })
+      });
 
-    if (xPosition === 340) {
+      if (xPosition >= 420) {
+        clearInterval(missleInterval);
         missle.remove();
       } else {
-          missle.style.left = `${xPosition + 8}px`;
+        missle.style.left = `${xPosition + 8}px`;
       }
     }, 15);
 
 }
 
+//Random enemy creating
 function createEnemies() {
     let newEnemy = document.createElement('img');
     let enemyRan = enemyImage[Math.floor(Math.random() * enemyImage.length)];
     newEnemy.src = enemyRan;
     newEnemy.classList.add('enemy');
     newEnemy.classList.add('enemy-transition');
-    newEnemy.style.left = '400px';
+    newEnemy.style.left = '420px';
     newEnemy.style.top = `${Math.floor(Math.random() * 330) + 30}px`;
     playArea.appendChild(newEnemy);
     moveEnemy(newEnemy);
   }
 
 
+//Enemy Movement.
 
   function moveEnemy(enemy){
     let moveEnemyInterval = setInterval(() => {
@@ -128,7 +137,16 @@ function createEnemies() {
             gameOver();
         } 
       } else {
-          enemy.style.left = `${xPosition - 4}px`;
+           //console.log(score);
+          if(score<5) {
+            enemy.style.left = `${xPosition - 4}px`;
+          } else if(score<10) {
+            enemy.style.left = `${xPosition - 5}px`;
+          }else if(score<20) {
+            enemy.style.left = `${xPosition - 6}px`;
+          }else {
+            enemy.style.left = `${xPosition - 7}px`;
+          }
       }
     }, 30);
   }
@@ -136,20 +154,23 @@ function createEnemies() {
   function checkMissleCollision(missle, enemy) {
     let missleTop = parseInt(missle.style.top);
     let missleLeft = parseInt(missle.style.left);
-    let missleCenter = missleTop + 15;
-    let missleBottom = missleTop - 20;
+    let missleCenter = missleTop + (GameDimensions.missleHeight/2);
+    let missleBottom = missleTop + GameDimensions.missleHeight;
     
     let enemyTop = parseInt(enemy.style.top);
     let enemyLeft = parseInt(enemy.style.left);
-    let enemyBottom = enemyTop - 30;
+    let enemyBottom = enemyTop + GameDimensions.enemyHeight;
     
-    if (missleLeft != 340 && missleLeft + 40 >= enemyLeft) {
-      if (missleTop <= enemyTop && missleTop >= enemyBottom || missleCenter <= enemyTop && missleCenter >= enemyBottom || missleBottom <= enemyTop && missleTop >= enemyBottom) {
+
+    if (missleLeft + GameDimensions.missleWidth >= enemyLeft) {
+      if (missleCenter <= enemyBottom && missleCenter >= enemyTop-20) {
         return true;
       } else {
-          return false;
+        return false;
       }
-    } 
+    } else {
+      return false;
+    }
   }
 
 //Scoreboard
@@ -176,7 +197,7 @@ startButton.addEventListener('click', (event) => {
 
   
 
-//OVER
+//Gameover
 
   function gameOver() {
     score = 0;
@@ -188,7 +209,7 @@ startButton.addEventListener('click', (event) => {
     missles.forEach((missle) => missle.remove());
     setTimeout(() => {
       document.getElementById("restart-button").innerHTML = "RESTART";
-      document.getElementById("game-over").innerHTML = "You fail please try Again";
+      document.getElementById("game-over").innerHTML = "YOU FAIL PLEASE TRY AGAIN!";
       playerCraft.style.top = "250px";
       startButton.style.display = "block";
       instructionText.style.display = "block";
