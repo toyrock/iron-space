@@ -9,6 +9,7 @@ let score = 0;
 let gameBcK = new Image();
 gameBcK.src = 'img/bground.jpg';
 
+
 let sfxShoot=document.getElementById("sfxShoot");
 let sfxExplosion=document.getElementById("sfxExplosion");
 let Key = {
@@ -64,7 +65,7 @@ function playerMovement(event) {
     }
   }
 
-  //Fire Missile
+  //Fire Missile function
   function fireMissle() {
     sfxShoot.play();
     let missle = createMissleElement();
@@ -99,7 +100,7 @@ function playerMovement(event) {
           missle.remove();
       }
       });
-
+      //range missle and remove
       if (xPosition >= 420) {
         clearInterval(missleInterval);
         missle.remove();
